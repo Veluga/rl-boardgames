@@ -1,3 +1,4 @@
+import json
 import pytest
 from conftest import generate_taken
 from random import randint, seed
@@ -230,3 +231,47 @@ def test_update_state_taking_dice_causes_reroll(
     game.updateState(taking_action)
     assert game.state['rolled'] != rolled_pre
     assert len(game.state['rolled']) == HeckMeck.NUM_DICE - rolled_pre.count(taking_action.value)
+
+@pytest.mark.parametrize(
+    "pot_nums,taken",
+    [
+        ([21], [5, 5, 5, 5, 1]),
+        ([36], [5, 5, 5, 5, 5, 5, 5, 1]),
+    ]
+)
+def test_taking_pot_with_no_wurm_taken_raises(
+    game,
+    pot_nums,
+    taken
+):
+    state = {
+        'taken': taken,
+        'pot': pot_nums
+    }
+    game.state = state
+    with pytest.raises(
+        IllegalActionException
+    ):
+        game.updateState(HeckMeck.Action.TAKE_POT)
+
+@pytest.mark.parametrize(
+    "visible_nums,taken",
+    [
+        ([21], [5, 5, 5, 5, 1]),
+        ([36], [5, 5, 5, 5, 5, 5, 5, 1]),
+    ]
+)
+def test_taking_visible_with_no_wurm_taken_raises(
+    game,
+    visible_nums,
+    taken
+):
+    state = {
+        'taken': taken,
+        'visible': visible_nums
+    }
+    game.state = state
+    with pytest.raises(
+        IllegalActionException
+    ):
+        game.updateState(HeckMeck.Action.TAKE_VISIBLE)

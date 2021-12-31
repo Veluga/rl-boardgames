@@ -1,5 +1,8 @@
+import json
 from enum import Enum, auto
 from random import randint
+
+WURM_VALUE = 6
 
 class IllegalActionException(Exception):
     pass
@@ -11,7 +14,7 @@ class HeckMeck:
         TAKE_THREE = 3
         TAKE_FOUR = 4
         TAKE_FIVE = 5
-        TAKE_WURM = 6
+        TAKE_WURM = WURM_VALUE
         TAKE_POT = auto()
         TAKE_VISIBLE = auto()
     
@@ -91,12 +94,16 @@ class HeckMeck:
             return self.takeDice(action)
             
         if action == HeckMeck.Action.TAKE_POT:
+            if WURM_VALUE not in self.state['taken']:
+                raise IllegalActionException("To take number from pot at least one Wurm must have been taken.")
             return self.getLargestAvailableInSelection(
                 self.state['taken'],
                 self.state['pot']
             )
-            
+
         if action == HeckMeck.Action.TAKE_VISIBLE:
+            if WURM_VALUE not in self.state['taken']:
+                raise IllegalActionException("To take number from visible at least one Wurm must have been taken.")
             return self.getMatchingInSelection(
                 self.state['taken'],
                 self.state['visible']
